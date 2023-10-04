@@ -52,30 +52,11 @@ public class Mastermind {
     public static String generateCodeword() {
         String result = "";
         for ( int i = 0; i<4; i++) {
-            int num = (int)Math.ceil(Math.random()*6); // get random int from 1 to 6
+            int num = 1 + (int)(Math.random()*6); // get random int from 1 to 6
             result += num; // append to result
         }
         return result;
     } // end of generateCodeword method
-
-
-    // Executes the code to play Part 1 of the project
-    public static void playPartOne(){
-        Scanner keyboard = new Scanner(System.in);
-        boolean moreGames = true;
-        
-        while ( moreGames ) {
-            System.out.println("---- Lets play Mastermind ---");
-            String codeword = generateCodeword(); // creates codeword
-            
-            System.out.println(codeword);
-
-
-            if (!anotherGame(keyboard)) { // asks if user wants to play another game
-                moreGames = false;
-            }
-        } 
-    } // end of playPartOne method
 
 
     // Checks validity of responses and returns true if 'y', false if otherwise
@@ -96,6 +77,92 @@ public class Mastermind {
 
         return action.charAt(0) == 'y';
     } // end of anotherGame method
+
+
+    // Asks the user if he wants the codeword revealed and executes the action
+    public static void revealCodeword( Scanner in, String codeword){
+        System.out.print("Reveal the codeword (y/n)? ");
+        String input;
+        
+        while (true) {
+            input = in.next();
+            input = input.toLowerCase();
+            if (input.charAt(0) == 'y'){
+                System.out.printf("The codeword is %s.%n", codeword);
+                break;
+            }
+            else if (input.charAt(0) == 'n') {
+                break;
+            }
+            else{
+                System.out.println("Invalid character, try again");
+            }
+        }
+    } // end of revealCodeword method
+
+
+    // Checks for validity of a guess 
+    public static boolean guessValid(String guess){
+        if (guess.length() != 4){ // Checks length
+            return false;
+        }
+
+        int i;
+        for (i = 0; i < 4; i++){ // Cheks for chars 1,2,3,4,5,6
+            if (guess.charAt(i) > '6' || guess.charAt(i) < '1') {
+                return false;
+            }
+        }
+        return true;
+    } // end of guessValid method
+
+
+    // Executes the code to play Part 1 of the project
+    public static void playPartOne(){
+        Scanner keyboard = new Scanner(System.in);
+        boolean moreGames = true;
+        String guess;
+        int round = 1;
+        
+        while ( moreGames ) {
+            System.out.println("---- Lets play Mastermind ---");
+            String codeword = generateCodeword(); // creates codeword
+            
+            revealCodeword( keyboard, codeword); // Asks for reveal
+
+            while (true) {  // Round loop
+                System.out.printf("Round = %d, Your guess (0 to stop) ", round);
+                
+                guess = keyboard.next(); // get guess
+                
+                if (guess.equals("0")) { // cancel game when guess is 0
+                    System.out.printf("The codeword was %s.%n", codeword);
+                    break;
+                } 
+                
+                if (!guessValid(guess)) { // validate guess
+                    System.out.println("An invalid guess");
+                    continue;
+                }
+                
+                if (!codeword.equals(guess)){ // give hit and miss info if guess is incorrect
+                    System.out.printf("%d hits, %d misses.%n", getHits(codeword, guess), getMisses(codeword, guess));
+                    round += 1;
+                    continue;
+                }
+                
+                // give win feedback when it matches.
+                System.out.println("You Won !!!!");
+                break;
+            }
+
+
+
+            if (!anotherGame(keyboard)) { // asks if user wants to play another game
+                moreGames = false;
+            }
+        } 
+    } // end of playPartOne method
     
 
 } // end of Mastermind class
