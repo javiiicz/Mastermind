@@ -22,7 +22,7 @@ public class Mastermind {
 
 
     // Returns the number of times a character appears in a string
-    public static int aparitions(String s, char c) {
+    public static int apparitions(String s, char c) {
         int result = 0;
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == c) { // if the character at the index is the same as c
@@ -30,7 +30,7 @@ public class Mastermind {
             }
         }
         return result;
-    } // end of aparitions method
+    } // end of apparitions method
 
 
     // Gets the number of misses with a given guess (correct character in wrong place)
@@ -39,9 +39,9 @@ public class Mastermind {
         misses = 0;
         for (d = 1; d <= 6; d++) {
             char charD = (char)(d + '0'); // converts the integer d to a character
-            misses += Math.min(aparitions(guess, charD ), aparitions(codeword, charD )); // adds the minimum aparitions of the character in both strings
+            misses += Math.min(apparitions(guess, charD ), apparitions(codeword, charD )); // adds the minimum apparitions of the character in both strings
         }
-        return misses - getHits(codeword, guess); // substraction of the hits from the total misses
+        return misses - getHits(codeword, guess); // subtraction of the hits from the total misses
 
         // This uses the method specified in the project instructions
 
@@ -60,22 +60,21 @@ public class Mastermind {
 
 
     // Checks validity of responses and returns true if 'y', false if otherwise
-    public static boolean anotherGame( Scanner in){
+    public static boolean anotherGame( Scanner in ){
         System.out.print("Another game (y/n)? "); // Replay
         String action = "";
-        boolean responseValid = false;
 
-        while (!responseValid) {
+        while (true) {
             action = in.next();
             if (action.charAt(0) == 'y' || action.charAt(0) == 'n') {
-                responseValid = true;
+                return action.charAt(0) == 'y';
             }
             else{
                 System.out.println("Invalid character, try again");
             }
         }
 
-        return action.charAt(0) == 'y';
+
     } // end of anotherGame method
 
 
@@ -108,7 +107,7 @@ public class Mastermind {
         }
 
         int i;
-        for (i = 0; i < 4; i++){ // Cheks for chars 1,2,3,4,5,6
+        for (i = 0; i < 4; i++){ // Checks for chars 1,2,3,4,5,6
             if (guess.charAt(i) > '6' || guess.charAt(i) < '1') {
                 return false;
             }
@@ -145,7 +144,7 @@ public class Mastermind {
                     continue;
                 }
                 
-                if (!codeword.equals(guess)){ // give hit and miss info if guess is incorrect
+                if (!codeword.equals(guess)){ // give hit-and-miss info if guess is incorrect
                     System.out.printf("%d hits, %d misses.%n", getHits(codeword, guess), getMisses(codeword, guess));
                     round += 1;
                     continue;
