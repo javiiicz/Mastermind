@@ -3,7 +3,17 @@ import java.util.Scanner;
 
 public class Mastermind {
     public static void main(String[] args) {
-        playPartOne();
+        Scanner input = new Scanner(System.in);
+        System.out.print("Type 1 for Part One or 2 for Part Two: ");
+        String action = input.next();
+
+        if (action.equals("1")){
+            playPartOne();
+        }
+        else{
+            playPartTwo();
+        }
+
         
     } // end of main method
 
@@ -62,7 +72,7 @@ public class Mastermind {
     // Checks validity of responses and returns true if 'y', false if otherwise
     public static boolean anotherGame( Scanner in ){
         System.out.print("Another game (y/n)? "); // Replay
-        String action = "";
+        String action;
 
         while (true) {
             action = in.next();
@@ -121,9 +131,9 @@ public class Mastermind {
         Scanner keyboard = new Scanner(System.in);
         boolean moreGames = true;
         String guess;
-        int round = 1;
         
         while ( moreGames ) {
+            int round = 1;
             System.out.println("---- Lets play Mastermind ---");
             String codeword = generateCodeword(); // creates codeword
             
@@ -162,6 +172,167 @@ public class Mastermind {
             }
         } 
     } // end of playPartOne method
-    
 
+
+    // Generates all possible codewords and stores them in an array
+    public static String[] generateAllCodewords() {
+        String[] array = new String[1296]; // Set length
+
+        int pos = 0; // position
+
+        for (int i = 1; i <= 6; i++){
+            for (int j = 1; j <= 6; j++){
+                for (int k = 1; k <= 6; k++){
+                    for (int l = 1; l <= 6; l++){ //4 nested loops, each one corresponds to one position
+                        array[pos++] = "" + i + j + k + l; //concatenate and add 1 to the position
+                    }
+                }
+            }
+        }
+
+        return array;
+    } // end of generateAllCodewords method
+
+
+    // deletes an element from an array
+    public static String[] delete(String[] array, int pos){
+        String[] newArray = new String[array.length - 1]; // create new array with one less element
+
+        for (int i = 0; i < array.length; i++){ //iterate through every element in array
+            if (i < pos) { // if less than position to be deleted, same position in new array
+                newArray[i] = array[i];
+            }
+            else if (i > pos){ // if position is greater than deleted element, element goes to i - 1
+                newArray[i-1] = array[i];
+            }
+        }
+        return newArray;
+    } // end of delete method
+
+
+    // Finds the position of a codeword in the array
+    public static int findPosition(String codeword, String[] array){
+        for (int i = 0; i < array.length; i++) {
+            if (array[i].equals(codeword)){
+                return i;
+            }
+        }
+        return -1;
+    } // end of findPosition method
+
+
+    // Eliminates candidates based on hits and misses
+    public static String[] siftCandidates(int hits, int misses, String[] array, String codeword){
+        int starCount = 0;
+        for (int i = 0; i < array.length; i++){ // iterates through every element
+            int elementHits = getHits(codeword, array[i]);
+            int elementMisses = getMisses(codeword, array[i]);
+            if (( elementHits != hits) || (elementMisses != misses)){
+                array[i] = "*";
+                starCount += 1;
+            }
+        }
+
+        String[] newArray = new String[array.length-starCount];
+        int j = 0;
+        for (int i = 0; i < array.length; i++){
+            if (!array[i].equals("*")) {
+                newArray[j++] = array[i];
+            }
+        }
+
+
+        return newArray;
+    } // end of siftCandidates method
+
+
+    // Gets a valid codeword from the user
+    public static String inputCodeword(Scanner input){
+        String codeword;
+        while (true){
+            System.out.print("Enter your codeword: ");
+            codeword = input.next(); // input from user
+
+            if (guessValid(codeword)) { // validates the codeword
+                break;
+            }
+
+            System.out.println("This is an invalid codeword, try again."); // only executes if invalid
+        }
+        return codeword;
+    } // end of inputCodeword method
+
+
+    // Asks the user if it wants to input feedback
+    public static boolean askForFeedback(Scanner input){
+        System.out.print("Enter feedback yourself (y/n)? ");
+        String action;
+
+        while (true) {
+            action = input.next();
+            if (action.charAt(0) == 'y' || action.charAt(0) == 'n') {
+                return action.charAt(0) == 'y';
+            }
+            else{
+                System.out.println("Invalid character, try again");
+            }
+        }
+    }
+
+    // Executes the code for Part 2 of the project
+    public static void playPartTwo(){
+        Scanner keyboard = new Scanner(System.in);
+        boolean moreGames = true;
+        boolean feedback;
+
+        while (moreGames) {
+            System.out.println("---- Let's Play Mastermind (Part 2) ----");
+            String codeword = inputCodeword(keyboard); // get codeword from user
+            feedback = askForFeedback(keyboard); // feedback?
+            String[] array = generateAllCodewords();
+            int round = 1;
+
+            while (true) {
+                int hits;
+                int misses;
+                int position = (int)(Math.random() * array.length);
+                String guess = array[position]; // get a random element from the array
+                System.out.printf("Round %d, Size = %d, Guess = %s%n", round, array.length, guess);
+                round++;
+
+                if (array.length == 1){
+                    System.out.println("The computer found the codeword!");
+                    System.out.printf("The codeword was %s%n", array[0]);
+                    break;
+                }
+
+                if (!feedback) {
+                    hits = getHits(codeword, guess);
+                    misses = getMisses(codeword, guess);
+                } else {
+                    System.out.print("Enter feedback: ");
+                    String userFeedback = keyboard.next();
+
+                    hits = userFeedback.charAt(0);
+                    misses = userFeedback.charAt(1);
+                }
+
+
+                array = siftCandidates(hits, misses, array, guess);
+
+
+                if (array.length == 0){
+                    System.out.println("Error. No more candidates.");
+                    break;
+                }
+
+
+            }
+
+            if (!anotherGame(keyboard)) { // asks if user wants to play another game
+                moreGames = false;
+            }
+        }
+
+    } // end of playPartTwo method
 } // end of Mastermind class
