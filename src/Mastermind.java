@@ -4,7 +4,7 @@ import java.util.Scanner;
 public class Mastermind {
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
-        System.out.print("Type 1 for Part One or 2 for Part Two: ");
+        System.out.print("Type (1) for Part One or (2) for Part Two: ");
         String action = input.next();
 
         if (action.equals("1")){
@@ -13,8 +13,6 @@ public class Mastermind {
         else{
             playPartTwo();
         }
-
-        
     } // end of main method
 
 
@@ -83,8 +81,6 @@ public class Mastermind {
                 System.out.println("Invalid character, try again");
             }
         }
-
-
     } // end of anotherGame method
 
 
@@ -176,15 +172,15 @@ public class Mastermind {
 
     // Generates all possible codewords and stores them in an array
     public static String[] generateAllCodewords() {
-        String[] array = new String[1296]; // Set length
+        String[] array = new String[1296];
 
         int pos = 0; // position
 
         for (int i = 1; i <= 6; i++){
             for (int j = 1; j <= 6; j++){
                 for (int k = 1; k <= 6; k++){
-                    for (int l = 1; l <= 6; l++){ //4 nested loops, each one corresponds to one position
-                        array[pos++] = "" + i + j + k + l; //concatenate and add 1 to the position
+                    for (int l = 1; l <= 6; l++){ // 4 nested loops, each one corresponds to one position
+                        array[pos++] = "" + i + j + k + l; // concatenate and add 1 to the position
                     }
                 }
             }
@@ -194,54 +190,30 @@ public class Mastermind {
     } // end of generateAllCodewords method
 
 
-    // deletes an element from an array
-    public static String[] delete(String[] array, int pos){
-        String[] newArray = new String[array.length - 1]; // create new array with one less element
-
-        for (int i = 0; i < array.length; i++){ //iterate through every element in array
-            if (i < pos) { // if less than position to be deleted, same position in new array
-                newArray[i] = array[i];
-            }
-            else if (i > pos){ // if position is greater than deleted element, element goes to i - 1
-                newArray[i-1] = array[i];
-            }
-        }
-        return newArray;
-    } // end of delete method
-
-
-    // Finds the position of a codeword in the array
-    public static int findPosition(String codeword, String[] array){
-        for (int i = 0; i < array.length; i++) {
-            if (array[i].equals(codeword)){
-                return i;
-            }
-        }
-        return -1;
-    } // end of findPosition method
-
-
     // Eliminates candidates based on hits and misses
     public static String[] siftCandidates(int hits, int misses, String[] array, String codeword){
         int starCount = 0;
-        for (int i = 0; i < array.length; i++){ // iterates through every element
+
+        // First, converts all codewords to be deleted to "*"
+        for (int i = 0; i < array.length; i++){ // iterates through every element of the array
+
             int elementHits = getHits(codeword, array[i]);
             int elementMisses = getMisses(codeword, array[i]);
+
             if (( elementHits != hits) || (elementMisses != misses)){
                 array[i] = "*";
-                starCount += 1;
+                starCount++;
             }
         }
 
-        String[] newArray = new String[array.length-starCount];
+        // Second, makes a new array without the "*"
+        String[] newArray = new String[ array.length - starCount];
         int j = 0;
         for (int i = 0; i < array.length; i++){
             if (!array[i].equals("*")) {
                 newArray[j++] = array[i];
             }
         }
-
-
         return newArray;
     } // end of siftCandidates method
 
@@ -289,36 +261,39 @@ public class Mastermind {
             System.out.println("---- Let's Play Mastermind (Part 2) ----");
             String codeword = inputCodeword(keyboard); // get codeword from user
             feedback = askForFeedback(keyboard); // feedback?
-            String[] array = generateAllCodewords();
+            String[] array = generateAllCodewords(); // store all codewords in an array
             int round = 1;
 
-            while (true) {
+            while (true) { // loop rounds
                 int hits;
                 int misses;
-                int position = (int)(Math.random() * array.length);
-                String guess = array[position]; // get a random element from the array
+                int position = (int)(Math.random() * array.length); // get a random element from the array
+                String guess = array[position];
                 System.out.printf("Round %d, Size = %d, Guess = %s%n", round, array.length, guess);
                 round++;
 
-                if (array.length == 1){
+                if (array.length == 1){ // if there's only 1 possible solution
                     System.out.println("The computer found the codeword!");
                     System.out.printf("The codeword was %s%n", array[0]);
                     break;
                 }
 
-                if (!feedback) {
+                if (!feedback) { // user does not input want feedback
                     hits = getHits(codeword, guess);
                     misses = getMisses(codeword, guess);
-                } else {
+                }
+                else {  // user wants to input feedback
                     System.out.print("Enter feedback: ");
                     String userFeedback = keyboard.next();
 
-                    hits = userFeedback.charAt(0);
-                    misses = userFeedback.charAt(1);
+                    hits = userFeedback.charAt(0) - '0'; // substracts char 0 to get the int
+                    misses = userFeedback.charAt(1)- '0';
                 }
 
+                System.out.printf("Hits: %d, Misses: %d%n", hits, misses);
 
-                array = siftCandidates(hits, misses, array, guess);
+
+                array = siftCandidates(hits, misses, array, guess); // eliminates candidates from array
 
 
                 if (array.length == 0){
