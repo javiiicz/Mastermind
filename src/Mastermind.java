@@ -170,6 +170,10 @@ public class Mastermind {
     } // end of playPartOne method
 
 
+    // ******************************************************************************************
+    // ********************* PART TWO ***********************************************************
+    // ******************************************************************************************
+
     // Generates all possible codewords and stores them in an array
     public static String[] generateAllCodewords() {
         String[] array = new String[1296];
@@ -191,14 +195,14 @@ public class Mastermind {
 
 
     // Eliminates candidates based on hits and misses
-    public static String[] siftCandidates(int hits, int misses, String[] array, String codeword){
+    public static String[] siftCandidates(int hits, int misses, String[] array, String guess){
         int starCount = 0;
 
         // First, converts all codewords to be deleted to "*"
         for (int i = 0; i < array.length; i++){ // iterates through every element of the array
 
-            int elementHits = getHits(codeword, array[i]);
-            int elementMisses = getMisses(codeword, array[i]);
+            int elementHits = getHits(guess, array[i]);
+            int elementMisses = getMisses(guess, array[i]);
 
             if (( elementHits != hits) || (elementMisses != misses)){
                 array[i] = "*";
@@ -207,7 +211,7 @@ public class Mastermind {
         }
 
         // Second, makes a new array without the "*"
-        String[] newArray = new String[ array.length - starCount];
+        String[] newArray = new String[array.length - starCount];
         int j = 0;
         for (int i = 0; i < array.length; i++){
             if (!array[i].equals("*")) {
@@ -287,7 +291,7 @@ public class Mastermind {
                     String userFeedback = keyboard.next();
 
                     hits = userFeedback.charAt(0) - '0'; // substracts char 0 to get the int
-                    misses = userFeedback.charAt(1)- '0';
+                    misses = userFeedback.charAt(1) - '0';
                 }
 
                 System.out.printf("Hits: %d, Misses: %d%n", hits, misses);
