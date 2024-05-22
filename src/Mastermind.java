@@ -13,6 +13,7 @@ public class Mastermind {
         else{
             playPartTwo();
         }
+        input.close();
     } // end of main method
 
 
